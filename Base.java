@@ -30,11 +30,15 @@ public class Base
       System.out.println("Would you like to build anything?");
       String in = scan.nextLine();
       int working = 0;
+      String struc = "";
       if(in.equalsIgnoreCase("yes"))
       {
          //how many workers to assign and what structure, display amount of turns it will take and ask if they are sure
          System.out.println("Amount of population dedicated to construction:");
           working = scan.nextInt();
+          System.out.println("What structure?");
+          struc = scan.nextLine();
+          
       }
       else if(in.equalsIgnoreCase("no"))
       {
@@ -68,13 +72,31 @@ public class Base
          cycle(tribe);
       }
       //Execute Day(the function not only executes the day, but returns a string summarizing everything done in the way, same goes for executeNight)
-      System.out.println(tribe.executeDay(working, farming, worshiping, defending, researching, stoneMining, woodCutting));
+      if(struc.equals(""))
+      {
+      
+         System.out.println(tribe.executeDay(farming, worshiping, defending, researching, woodCutting, stoneMining));
+      }
+      if(!struc.equals(""))
+      {
+         System.out.println(tribe.executeDayWithStructure(working, farming, worshiping, defending, researching, stoneMining, woodCutting, struc));
+      }
+      
 
       //Display Stats
       tribe.displayStats();
       //Execute Night
-      System.out.println(tribe.executeNight(defending));
+      //System.out.println(tribe.executeNight(defending));
       //Repeat
+   }
+   
+   public static double round(double value, int places) {
+    if (places < 0) throw new IllegalArgumentException();
+
+    long factor = (long) Math.pow(10, places);
+    value = value * factor;
+    long tmp = Math.round(value);
+    return (double) tmp / factor;
    }
 
 }

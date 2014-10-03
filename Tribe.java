@@ -51,7 +51,7 @@ public class Tribe
       stone = 10;
       hasIron = false;
       hasCopper = false;
-      happiness = 50;
+      happiness = .5;
       population = 15;
       temple = 0;
       barracks = 0;
@@ -99,11 +99,13 @@ public class Tribe
       System.out.println("Tribe Statistics:");
       System.out.println("----------------------------------");
       System.out.println("|Population:");
-      System.out.println("|              "+population);   
+      System.out.println("|              "+Base.round(population, 2));   
       System.out.println("|Wood:");
-      System.out.println("|              "+wood);   
+      System.out.println("|              "+Base.round(wood, 2));   
       System.out.println("|Stone:");
-      System.out.println("|              "+stone);
+      System.out.println("|              "+Base.round(stone, 2));
+      System.out.println("|Food:");
+      System.out.println("|              "+Base.round(food, 2));
       System.out.println("|Technologies:");
       System.out.print("|              ");
       System.out.print((hasCopper) ? "Copper" : "");
@@ -113,9 +115,9 @@ public class Tribe
       System.out.print((!isNomadic) ? "Farming" : "");
       System.out.println();
       System.out.println("|Happiness Value:");
-      System.out.println("|              "+happiness);
+      System.out.println("|              "+Base.round(happiness, 2));
       System.out.println("|Defense Value:");
-      System.out.println("|              "+defense);
+      System.out.println("|              "+Base.round(defense, 2));
       System.out.print("|");
       System.out.print(canTrade ? "Trading Available" : "Cannot Trade");
       System.out.println();
@@ -156,5 +158,117 @@ public class Tribe
       System.out.print((leaderhut == 1) ? "|              Leader's Hut\n              " : "");
       System.out.print((capitol == 1) ? "|              Capitol Building\n              " : "");
       System.out.println("----------------------------------");
+   }
+   
+   public double getFoodProduction(int workers)
+   {
+      double foodProduction = 0;
+      int f = 0;
+      double rand = 0;
+      for(int n = 0; n < workers; n++) // gets food production based solely on amount of farmers
+      {
+         f = 1;
+         rand = -.15 + (Math.random()*.6);
+         foodProduction += rand + 1;
+      }
+      double happy = happiness;
+      happy = (happy/5);
+      for(int n = 0; n < workers; n++) // modifies total food based on happiness
+      {
+         rand = 0 + (Math.random()*happy);
+         foodProduction += rand;
+      }
+      if(isRain) // if it is raining, increase food production
+         foodProduction = foodProduction * 1.15;
+      if(aqueducts == 1)
+         foodProduction = foodProduction * 1.2;
+      if(trenches == 1)
+         foodProduction = foodProduction * 1.1;
+      
+      return foodProduction;
+   }
+   
+   public double getStoneProduction(int workers)
+   {
+      double stoneProduction = 0;
+      int f = 0;
+      double rand = 0;
+      for(int n = 0; n < workers; n++) // gets food production based solely on amount of farmers
+      {
+         f = 1;
+         rand = -.15 + (Math.random()*.6);
+         stoneProduction += rand + 1;
+      }
+      double happy = happiness;
+      happy = (happy/5);
+      for(int n = 0; n < workers; n++) // modifies total food based on happiness
+      {
+         rand = 0 + (Math.random()*happy);
+         stoneProduction += rand;
+      }
+      if(quarry == 1)
+         stoneProduction = stoneProduction * 1.15;
+      if(quarry == 2)
+         stoneProduction = stoneProduction * 1.3;
+      if(quarry == 3)
+         stoneProduction = stoneProduction * 1.45;
+
+      
+      return stoneProduction;
+   }
+   
+   public double getWoodProduction(int workers)
+   {
+      double stoneProduction = 0;
+      int f = 0;
+      double rand = 0;
+      for(int n = 0; n < workers; n++) // gets food production based solely on amount of farmers
+      {
+         f = 1;
+         rand = -.15 + (Math.random()*.6);
+         stoneProduction += rand + 1;
+      }
+      double happy = happiness;
+      happy = (happy/5);
+      for(int n = 0; n < workers; n++) // modifies total food based on happiness
+      {
+         rand = 0 + (Math.random()*happy);
+         stoneProduction += rand;
+      }
+      if(cabin == 1)
+         stoneProduction = stoneProduction * 1.15;
+      if(cabin == 2)
+         stoneProduction = stoneProduction * 1.3;
+      if(cabin == 3)
+         stoneProduction = stoneProduction * 1.45;
+
+      
+      return stoneProduction;
+   }
+   
+   public String executeDay(int farming, int worshipping, int defending, int researching, int woodcutting, int stonemining)
+   {
+      String summary = "";
+      double foodProduction = getFoodProduction(farming);
+      food += foodProduction;
+      summary += "Food Produced: " + Base.round(foodProduction, 2) + "\n";
+      double stoneProduction = getStoneProduction(stonemining);
+      stone += stoneProduction;
+      summary += "Stone Produced: " + Base.round(stoneProduction, 2)+"\n";
+      double woodProduction = getWoodProduction(woodcutting);
+      wood += woodProduction;
+      summary += "Wood Produced: " + Base.round(woodProduction, 2)+"\n";
+      
+      
+      
+      
+      
+      
+      
+      return summary;
+   }
+   public String executeDayWithStructure(int working, int famring, int worshipping, int defending, int researching, int woodcutting, int stonemining, String structure)
+   {
+      return null;
    }
 }
