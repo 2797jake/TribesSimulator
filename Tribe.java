@@ -69,7 +69,7 @@ public class Tribe
       school = 0;
       torture = 0;
       tavern = 0;
-      theater = 0;
+      theater = 1;
       flag = 0;
       aqueducts = 0;
       trenches = 0;
@@ -83,8 +83,8 @@ public class Tribe
       negativechanceincrease = 0;
       defense = 50;
       canTrade = false;
-      nomadicDecayPerTurn = 1;
-      nomadicValue = 100;
+      nomadicDecayPerTurn = .02;
+      nomadicValue = 1;
       food = 20;
       isRain = false;
       isStorm = false;
@@ -460,9 +460,7 @@ public class Tribe
       if(s.equalsIgnoreCase("theater"))
          theater++;
       if(s.equalsIgnoreCase("theater"))
-         happiness+=.15;
-      if(s.equalsIgnoreCase("theater"))
-         happinessPerTurn+=.05;
+         happiness+=.1;
       if(s.equalsIgnoreCase("flag"))
          flag++;
       if(s.equalsIgnoreCase("aqueducts"))
@@ -520,6 +518,12 @@ public class Tribe
          builders = 0;
          struc = "";
       }
+      
+      //check if research is enough to upgrade
+      
+      
+      
+      
       //
       //
       if(karma <= 0)
@@ -568,18 +572,24 @@ public class Tribe
          negativechanceincrease += .15;
          karma = 1;
       }
-      if(happiness > .5)
-         happinessPerTurn -= .05;
-      if(happiness < .5)
-         happinessPerTurn += .05;
-      if(happiness == .5 && theater == 1)
+      happinessPerTurn = 0;
+      if(Base.round(happiness, 2) > .5)
+         happinessPerTurn = -.05;
+      if(Base.round(happiness, 2) < .5 )
          happinessPerTurn = .05;
-      else if(happiness == .5)
+      if(Base.round(happiness, 2) == .5)
          happinessPerTurn = 0;
-      System.out.println(happiness + "       /////////        " + happinessPerTurn);
-      happiness += happinessPerTurn;
+      if(theater == 1 && Base.round(happiness, 2) == .5)
+         happinessPerTurn = .05;
+      if(theater == 1 && Base.round(happiness, 2) < .5)
+         happinessPerTurn = .1;
+      if(theater == 1 && Base.round(happiness, 2) > .5)
+         happinessPerTurn = 0;
       
+      happiness += happinessPerTurn;  
       
+      if(isNomadic)
+         nomadicValue -= nomadicDecay
       
       return summary;
    }
@@ -610,6 +620,25 @@ public class Tribe
       summary += "Defense Value: " + Base.round(defense, 2) + "\n";
       
       summary += "Research Produced: " + getResearch(researching)+"\n";
+      
+      //
+      //
+      if(!struc.equals(""))
+         summary += "Work done on new structure: " + Base.round(getConstruction(), 2) + " completed " + Base.round(construction,2) + " out of " + maxConstruction + "\n";
+      if(construction >= maxConstruction && maxConstruction > 0)
+      {
+         completeStructure();
+         construction = 0;
+         maxConstruction = 0;
+         summary += struc + " was completed, the " + builders + " workers are now available";
+         builders = 0;
+         struc = "";
+      }
+      
+      //check if research is enough to upgrade
+      
+      
+      
       
       //
       //
@@ -680,16 +709,27 @@ public class Tribe
          negativechanceincrease += .15;
          karma = 1;
       }
-      if(happiness > .5)
-         happinessPerTurn -= .05;
-      if(happiness < .5)
-         happinessPerTurn += .05;
-      if(happiness == .5 && theater == 1)
+      
+      happinessPerTurn = 0;
+      if(Base.round(happiness, 2) > .5)
+         happinessPerTurn = -.05;
+      if(Base.round(happiness, 2) < .5 )
          happinessPerTurn = .05;
-      else if(happiness == .5)
+      if(Base.round(happiness, 2) == .5)
          happinessPerTurn = 0;
-      System.out.println(happiness + "       /////////        " + happinessPerTurn);
+      if(theater == 1 && Base.round(happiness, 2) == .5)
+         happinessPerTurn = .05;
+      if(theater == 1 && Base.round(happiness, 2) < .5)
+         happinessPerTurn = .1;
+      if(theater == 1 && Base.round(happiness, 2) > .5)
+         happinessPerTurn = 0;
+      
       happiness += happinessPerTurn;
+      
+      if(isNomadic)
+         nomadicValue -= nomadicDecay
+      
+      
       
       return summary;
    }
@@ -700,4 +740,4 @@ public class Tribe
    }  
 }
 
-//working on happinessperturn stuff
+//need to implement nomadicValue into resource production
