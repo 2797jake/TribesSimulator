@@ -27,7 +27,7 @@ public class Tribe
    private int capitol;
    private double happinessPerTurn;
    private double karmaPerTurn;
-   private double karma; // This is the one that decreases each turn there is no religion production
+   private double karma;
    private double positivechanceincrease;
    private double negativechanceincrease;
    private double defense;
@@ -52,6 +52,7 @@ public class Tribe
    private double popGrowth;
    private double woodCost;
    private double stoneCost;
+   private boolean canBeAttacked;
    public Tribe(String n)
    {
       name = n;
@@ -106,6 +107,7 @@ public class Tribe
       popGrowth = 0;
       woodCost = 0;
       stoneCost = 0;
+      canBeAttacked = true;
    }
    
    public int getPopulation()
@@ -294,6 +296,10 @@ public class Tribe
          {
             positivechanceincrease += .15;
          }
+         if(isRainbow)
+         {
+            positivechanceincrease += .15;
+         }
       }
    }
    
@@ -357,6 +363,8 @@ public class Tribe
          c *= 1.1;
       if(school == 2)
          c *= 1.2;
+      if(isWarm)
+         c *= 1.3;
       construction += c;
       return c;
       
@@ -690,6 +698,61 @@ public class Tribe
       wood -= cc*.5;
       stone -= cc*.75;
       summary += "Produced " + cc + " weapons\n";
+   
+   
+   
+      if(isStorm)
+      {
+         isRainbow = true;
+         canBeAttacked = true;
+      }
+      else
+      {
+         
+         isRain = false;
+         isWarm = false;
+         isRainbow = false;
+         int rand = 1 + (int)(Math.random()*100);
+         System.out.println(rand + "dsaWSZ");
+         if(rand < 10)
+            isRain = true;
+         if(rand < 16 && rand > 9)
+            isStorm = true;
+         if(rand < 22 && rand > 15)
+            isWarm = true;
+      }
+      if(isRain)
+      {
+         happiness -= .2;
+         summary += "Happiness decreased due to rain, food production increased due to rain\n";
+      }
+      
+      if(isStorm)
+      {
+         happiness -= .2;
+         summary += "Happiness decreased due to the storm, cannot be attacked due to the storm\n";
+         canBeAttacked = false;
+         int rrand = 1 + (int)(Math.random()*100);
+         if(rrand < 11)
+         {
+            population --;
+            summary += "A worker was struck by lightning and died due to the storm\n";
+         }
+      }
+      
+      if(isRainbow)
+      {
+         happiness += .3;
+         summary += "Happiness increased due to the rainbow, bonus karma due to the rainbow\n";
+      }
+      
+      if(isWarm)
+      {
+         happiness += .2;
+         summary += "Happines increased due to the good weather, bonus construction rate due to the weather";
+      }
+      
+      
       
       
       if(!struc.equals(""))
@@ -758,7 +821,7 @@ public class Tribe
          karma = 100;
          canKarma = false;
          daysOfCurse = 5;
-         negativechanceincrease += -.15;
+         negativechanceincrease += -15;
       }
       if(daysOfCurse > 0)
       {
@@ -776,7 +839,6 @@ public class Tribe
          Base.gameOver();
       double f = food;
       double p = population;
-      System.out.println(f-p + "foods");
       popGrowth += f-p;
       int count = 0;
       if(population == 18&& popGrowth > 20)
@@ -848,7 +910,7 @@ public class Tribe
          summary += "Your curse has been lifted, you may now produce karma again\n";
          daysOfCurse = -1;
          canKarma = true;
-         negativechanceincrease += .15;
+         negativechanceincrease += 15;
          karma = 1;
       }
       happinessPerTurn = 0;
@@ -874,6 +936,8 @@ public class Tribe
    }
    public String executeDayWithStructure(int working, int farming, int worshipping, int defending, int researching, int woodcutting, int stonemining, int itemC, String structure)
    {
+   
+   
       String summary = "";
       int cc = itemC;
       woodCost = 0;
@@ -881,10 +945,7 @@ public class Tribe
       woodCost += cc*.5;
       stoneCost += cc*.75;
       
-      /*weapons += cc;
-      wood -= cc*.5;
-      stone -= cc*.75;
-      summary += "Produced " + cc + " weapons\n";*/
+      
       
       struc = structure;
       builders = working;
@@ -907,9 +968,70 @@ public class Tribe
          System.out.println("Not enough resources");
          Base.cycle(this);
       }
+      
+      
+   
+      if(isStorm)
+      {
+         isRainbow = true;
+         canBeAttacked = true;
+      }
+      else
+      {
+         
+         isRain = false;
+         isWarm = false;
+         isRainbow = false;
+         int rand = 1 + (int)(Math.random()*100);
+         System.out.println(rand + "dsaWSZ");
+         if(rand < 10)
+            isRain = true;
+         if(rand < 16 && rand > 9)
+            isStorm = true;
+         if(rand < 22 && rand > 15)
+            isWarm = true;
+      }
+      if(isRain)
+      {
+         happiness -= .2;
+         summary += "Happiness decreased due to rain, food production increased due to rain\n";
+      }
+      
+      if(isStorm)
+      {
+         happiness -= .2;
+         summary += "Happiness decreased due to the storm, cannot be attacked due to the storm\n";
+         canBeAttacked = false;
+         int rrand = 1 + (int)(Math.random()*100);
+         if(rrand < 11)
+         {
+            population --;
+            summary += "A worker was struck by lightning and died due to the storm\n";
+         }
+      }
+      
+      if(isRainbow)
+      {
+         happiness += .3;
+         summary += "Happiness increased due to the rainbow, bonus karma due to the rainbow\n";
+      }
+      
+      if(isWarm)
+      {
+         happiness += .2;
+         summary += "Happines increased due to the good weather, bonus construction rate due to the weather";
+      }
+      
+      
+      
       wood -= woodCost;
       stone -= stoneCost;
       summary += "Work done on new structure: " + Base.round(getConstruction(), 2) + " out of " + maxConstruction + "\n";
+      
+      weapons += cc;
+      wood -= cc*.5;
+      stone -= cc*.75;
+      summary += "Produced " + cc + " weapons\n";
       
       
       
@@ -965,7 +1087,7 @@ public class Tribe
          karma = 100;
          canKarma = false;
          daysOfCurse = 5;
-         negativechanceincrease += -.15;
+         negativechanceincrease += -15;
       }
       if(daysOfCurse > 0)
       {
@@ -1055,7 +1177,7 @@ public class Tribe
          summary += "Your curse has been lifted, you may now produce karma again\n";
          daysOfCurse = -1;
          canKarma = true;
-         negativechanceincrease += .15;
+         negativechanceincrease += 15;
          karma = 1;
       }
       
@@ -1083,10 +1205,52 @@ public class Tribe
       return summary;
    }
    
+   
+   
+   
+   
+   
+   public String executeNight(int working)
+   {
+      String summary = "";
+      int rand = 0;
+      boolean isAttacked = false;
+      rand = 1 + (int)(Math.random()*(100+negativechanceincrease));
+      if(rand <= 25 && canBeAttacked)
+      {
+         rand = 1 + (int)(Math.random()*100);
+         if(rand > defense*100)
+         {
+            double d = defense*100;
+            summary += "You were attacked in the middle of the night. There was a " + Base.round(d,2) + "% of victory, and you won the encounter. This resulted in a slight boost in happiness";
+            happiness += .1;
+         }
+         else
+         {
+            double d = defense*100;
+            summary += "You were attacked in the middle of the night. There was a " + Base.round(d,2) + "% of victory, and you lost the encounter. This resulted a loss of population and food and a decrease in happiness";
+            happiness -= .1;
+            double p = population*(.2);
+            population -= (int)p;
+            p = food*(.25);
+            food -= p;
+         }
+      }
+      
+      
+      
+      
+      
+      return summary;
+   }
+   
+   
+   
+   
+   
+   
    public int getBuilders()
    {
       return builders;
    }  
 }
-
-//need to implement nomadicValue into resource production

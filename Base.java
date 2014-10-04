@@ -3,6 +3,7 @@ public class Base
 {
    public static void main(String args[])
    {
+      
       newTribe();
 
    }
@@ -18,6 +19,41 @@ public class Base
       System.out.print("Name your village:");
       String name = scan.nextLine();
       Tribe tribe = new Tribe(name);
+      
+      /*
+      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
+      tribe.displayStats();
+      tribe = new Tribe(name);
+      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
+      tribe.displayStats();
+      tribe = new Tribe(name);
+      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
+      tribe.displayStats();
+      tribe = new Tribe(name);
+      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
+      tribe.displayStats();
+      tribe = new Tribe(name);
+      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
+      tribe.displayStats();
+      tribe = new Tribe(name);
+      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
+      tribe.displayStats();
+      tribe = new Tribe(name);
+      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
+      tribe.displayStats();
+      tribe = new Tribe(name);
+      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
+      tribe.displayStats();
+      tribe = new Tribe(name);
+      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
+      tribe.displayStats();
+      tribe = new Tribe(name);
+      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
+      tribe.displayStats();*/
+      
+      
+      
+      
       tribe.displayStats();
       cycle(tribe);
       
@@ -116,7 +152,10 @@ public class Base
       //Display Stats
       tribe.displayStats();
       //Execute Night
-      //System.out.println(tribe.executeNight(defending));
+      System.out.println("Press enter when you are ready to start the night");
+      scan.next();
+      System.out.println(tribe.executeNight(defending));
+      tribe.displayStats();
       //Repeat
       cycle(tribe);
    }
