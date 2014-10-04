@@ -36,7 +36,9 @@ public class Base
       if(in.equalsIgnoreCase("yes"))
       {
          if(tribe.getBuilders() > 0)
-            cycle(tribe);
+            {
+               cycle(tribe);
+            }
          //how many workers to assign and what structure, display amount of turns it will take and ask if they are sure
          System.out.println("Amount of population dedicated to construction:");
          working = scan.nextInt();
@@ -91,15 +93,23 @@ public class Base
          System.out.println("You assigned less workers than you have");
          cycle(tribe);
       }
+      System.out.println("Produce any weapons?");
+      int items = 0;
+      in = scan.next();
+      if(in.equalsIgnoreCase("yes"))
+      {
+         System.out.println("How many?");
+         items = scan.nextInt();
+      }
       //Execute Day(the function not only executes the day, but returns a string summarizing everything done in the way, same goes for executeNight)
       if(struc.equals(""))
       {
       
-         System.out.println(tribe.executeDay(farming, worshiping, defending, researching, woodCutting, stoneMining));
+         System.out.println(tribe.executeDay(farming, worshiping, defending, researching, woodCutting, stoneMining, items));
       }
       if(!struc.equals(""))
       {
-         System.out.println(tribe.executeDayWithStructure(working, farming, worshiping, defending, researching, stoneMining, woodCutting, struc));
+         System.out.println(tribe.executeDayWithStructure(working, farming, worshiping, defending, researching, stoneMining, woodCutting, items, struc));
       }
       
 
@@ -118,6 +128,12 @@ public class Base
     value = value * factor;
     long tmp = Math.round(value);
     return (double) tmp / factor;
+   }
+   
+   public static void gameOver()
+   {
+      System.out.println("You can out of food, game over!");
+      newTribe();
    }
 
 }

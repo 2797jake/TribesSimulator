@@ -49,6 +49,9 @@ public class Tribe
    private double maxConstruction;
    private boolean canKarma;
    private int daysOfCurse;
+   private double popGrowth;
+   private double woodCost;
+   private double stoneCost;
    public Tribe(String n)
    {
       name = n;
@@ -58,7 +61,7 @@ public class Tribe
       hasIron = false;
       hasCopper = false;
       happiness = .5;
-      population = 15;
+      population = 18;
       temple = 0;
       barracks = 0;
       walls = 0;
@@ -69,7 +72,7 @@ public class Tribe
       school = 0;
       torture = 0;
       tavern = 0;
-      theater = 1;
+      theater = 0;
       flag = 0;
       aqueducts = 0;
       trenches = 0;
@@ -81,11 +84,11 @@ public class Tribe
       karma = 1.0;
       positivechanceincrease = 0;
       negativechanceincrease = 0;
-      defense = 50;
+      defense = .3;
       canTrade = false;
-      nomadicDecayPerTurn = .02;
+      nomadicDecayPerTurn = .013;
       nomadicValue = 1;
-      food = 20;
+      food = 30;
       isRain = false;
       isStorm = false;
       isRainbow = false;
@@ -100,6 +103,9 @@ public class Tribe
       maxConstruction = 0;
       canKarma = true;
       daysOfCurse = -1;
+      popGrowth = 0;
+      woodCost = 0;
+      stoneCost = 0;
    }
    
    public int getPopulation()
@@ -177,15 +183,18 @@ public class Tribe
    {
       double foodProduction = 0;
       int f = 0;
+      
       double rand = 0;
       for(int n = 0; n < workers; n++) // gets food production based solely on amount of farmers
       {
          f = 1;
-         rand = -.15 + (Math.random()*.6);
-         foodProduction += rand + 1;
+         rand = -.08 + (Math.random()*.95);
+         rand += 1;
+         rand = rand - (.5-(nomadicValue/2));
+         foodProduction += rand;
       }
       double happy = happiness;
-      happy = (happy/5);
+      happy = (happy/4);
       for(int n = 0; n < workers; n++) // modifies total food based on happiness
       {
          rand = 0 + (Math.random()*happy);
@@ -197,6 +206,9 @@ public class Tribe
          foodProduction = foodProduction * 1.2;
       if(trenches == 1)
          foodProduction = foodProduction * 1.1;
+      //17.63
+      
+      
       
       return foodProduction;
    }
@@ -287,14 +299,14 @@ public class Tribe
    
    public void setDefenseValue(int workers)
    {
-      defense = .5;
+      defense = .3;
       for(int n = 0; n < workers; n++)
       {
          defense += .019;
       }
       for(int n = 0; n < weapons; n++)
       {
-         defense += .01;
+         defense += .008;
       }
       if(walls == 1)
          defense += .08;
@@ -381,7 +393,7 @@ public class Tribe
    {
       int count = 0;
       double cons = 0;
-      double max = getMaxConstruction(s);
+      double max = getMaxConstruction2(s);
       while(cons < max)
       {
          count++;
@@ -391,6 +403,185 @@ public class Tribe
    }
    
    private double getMaxConstruction(String s)
+   {
+      if(s.equalsIgnoreCase("temple"))
+      {
+         if(stone <=4 )
+            return -1;
+         if(wood <= 3 )
+            return -1;
+         stoneCost += 4;
+         woodCost +=3;
+         return 1;
+      }
+      if(s.equalsIgnoreCase("barracks"))
+      {
+         if(stone <= 6 )
+            return -1;
+         if(wood <= 4 )
+            return -1;
+         stoneCost += 6;
+         woodCost += 4;
+         return 1.8;
+      }
+      if(s.equalsIgnoreCase("walls"))
+      {
+         if(stone <= 12 )
+            return -1;
+         if(wood <= 5 )
+            return -1;
+         stoneCost += 12;
+         woodCost += 5;
+         return 3;
+      }
+      if(s.equalsIgnoreCase("logger's cabin"))
+      {
+         if(stone <= 1 )
+            return -1;
+         if(wood <= 3 )
+            return -1;
+         stoneCost += 1;
+         woodCost += 3;
+         return 1.2;
+      }
+      if(s.equalsIgnoreCase("quarry"))
+      {
+         if(stone <= 3 )
+            return -1;
+         if(wood <= 1 )
+            return -1;
+         woodCost += 1;
+         stoneCost += 3;
+         return 1.2;
+      }
+      if(s.equalsIgnoreCase("shrine"))
+      {
+         if(stone <= 9 )
+            return -1;
+         if(wood <= 8 )
+            return -1;
+         woodCost += 8;
+         stoneCost += 9;
+         return 3;
+      }
+      if(s.equalsIgnoreCase("laboratory"))
+      {
+         if(stone <=14 )
+            return -1;
+         if(wood <= 5 )
+            return -1;
+         woodCost += 5;
+         stoneCost += 14;
+         return 3;
+      }
+      if(s.equalsIgnoreCase("school"))
+      {
+         if(stone <= 4 )
+            return -1;
+         if(wood <= 8 )
+            return -1;
+         woodCost += 8;
+         stoneCost += 4;
+         return 2;
+      }
+      if(s.equalsIgnoreCase("torture room"))
+      {
+         if(stone <= 6 )
+            return -1;
+         if(wood <= 3 )
+            return -1;
+         woodCost += 3;
+         stoneCost += 6;
+         return .9;
+      }
+      if(s.equalsIgnoreCase("tavern"))
+      {
+         if(stone <= 2 )
+            return -1;
+         if(wood <= 7 )
+            return -1;
+         woodCost += 7;
+         stoneCost += 2;
+         return 1.2;
+      }
+      if(s.equalsIgnoreCase("theater"))
+      {
+         if(stone <= 5 )
+            return -1;
+         if(wood <= 14 )
+            return -1;
+         woodCost += 14;
+         stoneCost += 5;
+         return 3;
+      }
+      if(s.equalsIgnoreCase("flag"))
+      {
+         if(stone <= 1 )
+            return -1;
+         if(wood <= 3 )
+            return -1;
+         woodCost += 3;
+         stoneCost += 1;
+         return 1.5;
+      }
+      if(s.equalsIgnoreCase("aqueducts"))
+      {
+         if(stone <= 12 )
+         {
+            return -1;}
+         if(wood <= 6)
+            return -1;
+         woodCost += 6;
+         stoneCost += 12;
+         return 2.8;
+      }
+      if(s.equalsIgnoreCase("water trenches"))
+      {
+         if(stone <= 1 )
+            return -1;
+         if(wood <= 6 )
+            return -1;
+         woodCost += 6;
+         stoneCost += 1;
+         return 1.5;
+      }
+      if(s.equalsIgnoreCase("city hall"))
+      {
+         if(stone <= 4 )
+            return -1;
+         if(wood <= 8 )
+            return -1;
+         woodCost += 8;
+         stoneCost += 4;
+         return 2.5;
+      }
+      if(s.equalsIgnoreCase("leader's hut"))
+      {
+         if(stone <= 1 )
+            return -1;
+         if(wood <= 5 )
+            return -1;
+         stoneCost += 1;
+         woodCost += 5;
+         return 1.5;
+      }
+      if(s.equalsIgnoreCase("capitol"))
+      {
+         if(stone <= 16 )
+            return -1;
+         if(wood <= 8 )
+            return -1;
+         stoneCost += 16;
+         woodCost += 8;
+         return 3.5;
+      }
+      return 0;
+   }  
+   
+   
+   
+   
+   private double getMaxConstruction2(String s)
    {
       if(s.equalsIgnoreCase("temple"))
          return 1;
@@ -428,6 +619,8 @@ public class Tribe
          return 3.5;
       return 0;
    }  
+   
+   
    
    
    public void completeStructure()
@@ -477,9 +670,52 @@ public class Tribe
    
    
    
-   public String executeDay(int farming, int worshipping, int defending, int researching, int woodcutting, int stonemining)
+   public String executeDay(int farming, int worshipping, int defending, int researching, int woodcutting, int stonemining, int itemC)
    {
       String summary = "";
+      int cc = itemC;
+      if(itemC * .75 > stone)
+      {
+         System.out.println("Not enough resources");
+         Base.cycle(this);
+      }
+      itemC = cc;
+      if(itemC * .5 > wood)
+      {
+         System.out.println("Not enough resources");
+         Base.cycle(this);
+      }
+      
+      weapons += cc;
+      wood -= cc*.5;
+      stone -= cc*.75;
+      summary += "Produced " + cc + " weapons\n";
+      
+      
+      if(!struc.equals(""))
+         summary += "Work done on new structure: " + Base.round(getConstruction(), 2) + " completed " + Base.round(construction,2) + " out of " + maxConstruction + "\n";
+      if(construction >= maxConstruction && maxConstruction > 0)
+      {
+         completeStructure();
+         construction = 0;
+         maxConstruction = 0;
+         summary += struc + " was completed, the " + builders + " workers are now available";
+         builders = 0;
+         struc = "";
+      }
+      
+      
+      //
+      //
+      //
+      //
+      
+      
+      
+      
+      
+      
+      
       double foodProduction = getFoodProduction(farming);
       food += foodProduction;
       summary += "Food Produced: " + Base.round(foodProduction, 2) + "\n";
@@ -507,17 +743,7 @@ public class Tribe
       
       //
       //
-      if(!struc.equals(""))
-         summary += "Work done on new structure: " + Base.round(getConstruction(), 2) + " completed " + Base.round(construction,2) + " out of " + maxConstruction + "\n";
-      if(construction >= maxConstruction && maxConstruction > 0)
-      {
-         completeStructure();
-         construction = 0;
-         maxConstruction = 0;
-         summary += struc + " was completed, the " + builders + " workers are now available";
-         builders = 0;
-         struc = "";
-      }
+      
       
       //check if research is enough to upgrade
       
@@ -540,8 +766,61 @@ public class Tribe
       }
       if(karma == 100)
       {
-         summary += daysOfCurse + " days left until the curse is lifted";
+         summary += daysOfCurse + " days left until the curse is lifted\n";
       }
+      
+      food -= population;
+      summary += population + " food was consumed to maintain your population\n";
+      
+      if(food < 0)
+         Base.gameOver();
+      double f = food;
+      double p = population;
+      System.out.println(f-p + "foods");
+      popGrowth += f-p;
+      int count = 0;
+      if(population == 18&& popGrowth > 20)
+      {
+         summary += "Population grew by one\n";
+         population ++;
+      }
+      else if(population > 18&& population < 23 && popGrowth > 45)
+      {
+         summary += "Population grew by one\n";
+         population ++;
+      }
+      else if(population > 22&& population < 31 && popGrowth > 100)
+      {
+         summary += "Population grew by one\n";
+         population ++;
+      }
+      else if(population > 30 && population < 36 && popGrowth > 230)
+      {
+         summary += "Population grew by one\n";
+         population ++;
+      }
+      else if(population > 35 && population < 45 && popGrowth > 580)
+      {
+         summary += "Population grew by one\n";
+         population ++;
+      }
+      else if(population > 44 && population < 55 && popGrowth > 900)
+      {
+         summary += "Population grew by one\n";
+         population ++;
+      }
+      else if(population > 54 && population < 60 && popGrowth > 1700)
+      {
+         summary += "Population grew by one\n";
+         population ++;
+      }
+      else if(population > 59 && popGrowth > 2800)
+      {
+         summary += "Population grew by one\n";
+         population ++;
+      }
+      popGrowth = 0;
+      
       
       
       
@@ -589,13 +868,56 @@ public class Tribe
       happiness += happinessPerTurn;  
       
       if(isNomadic)
-         nomadicValue -= nomadicDecay
+         nomadicValue -= nomadicDecayPerTurn;
       
       return summary;
    }
-   public String executeDayWithStructure(int working, int farming, int worshipping, int defending, int researching, int woodcutting, int stonemining, String structure)
+   public String executeDayWithStructure(int working, int farming, int worshipping, int defending, int researching, int woodcutting, int stonemining, int itemC, String structure)
    {
       String summary = "";
+      int cc = itemC;
+      woodCost = 0;
+      stoneCost = 0;
+      woodCost += cc*.5;
+      stoneCost += cc*.75;
+      
+      /*weapons += cc;
+      wood -= cc*.5;
+      stone -= cc*.75;
+      summary += "Produced " + cc + " weapons\n";*/
+      
+      struc = structure;
+      builders = working;
+      construction = 0;
+      maxConstruction = getMaxConstruction(structure);
+      if(maxConstruction == -1)
+      {
+         maxConstruction = 0;
+         builders = 0;
+         struc = "";
+         System.out.println("Not enough resources");
+         Base.cycle(this);
+      }
+      
+      if(stoneCost > stone || woodCost > wood)
+      {
+         maxConstruction = 0;
+         builders = 0;
+         struc = "";
+         System.out.println("Not enough resources");
+         Base.cycle(this);
+      }
+      wood -= woodCost;
+      stone -= stoneCost;
+      summary += "Work done on new structure: " + Base.round(getConstruction(), 2) + " out of " + maxConstruction + "\n";
+      
+      
+      
+      //
+      //
+      //
+      //
+
       double foodProduction = getFoodProduction(farming);
       food += foodProduction;
       summary += "Food Produced: " + Base.round(foodProduction, 2) + "\n";
@@ -623,7 +945,7 @@ public class Tribe
       
       //
       //
-      if(!struc.equals(""))
+      /*if(!struc.equals(""))
          summary += "Work done on new structure: " + Base.round(getConstruction(), 2) + " completed " + Base.round(construction,2) + " out of " + maxConstruction + "\n";
       if(construction >= maxConstruction && maxConstruction > 0)
       {
@@ -633,36 +955,10 @@ public class Tribe
          summary += struc + " was completed, the " + builders + " workers are now available";
          builders = 0;
          struc = "";
-      }
+      }*/
       
       //check if research is enough to upgrade
       
-      
-      
-      
-      //
-      //
-      if(!struc.equals(""))
-         summary += "Work done on new structure: " + Base.round(getConstruction(), 2) + " completed " + Base.round(construction,2) + " out of " + maxConstruction + "\n";
-      if(construction >= maxConstruction && maxConstruction > 0)
-      {
-         completeStructure();
-         construction = 0;
-         maxConstruction = 0;
-         summary += struc + " was completed, the " + builders + " workers are now available";
-         builders = 0;
-         struc = "";
-      }
-      
-      //
-      //
-      struc = structure;
-      builders = working;
-      construction = 0;
-      maxConstruction = getMaxConstruction(structure);
-      summary += "Work done on new structure: " + Base.round(getConstruction(), 2) + " out of " + maxConstruction + "\n";
-      //
-      //
       if(karma <= 0)
       {
          summary += "You have fallen out of favor with the gods, your negative calculation odds are increased for the next 5 days. you cannot produce any karma until this curse is lifted\n";
@@ -678,7 +974,60 @@ public class Tribe
       if(karma == 100)
       {
          summary += daysOfCurse + " days left until the curse is lifted";
+         
       }
+      
+      food -= population;
+      summary += population + " food was consumed to maintain your population\n";
+      
+      if(food < 0)
+         Base.gameOver();
+      double f = food;
+      double p = population;
+      System.out.println(f-p + "foods");
+      popGrowth += f-p;
+      int count = 0;
+      if(population == 18&& popGrowth > 20)
+      {
+         summary += "Population grew by one\n";
+         population ++;
+      }
+      else if(population > 18&& population < 23 && popGrowth > 45)
+      {
+         summary += "Population grew by one\n";
+         population ++;
+      }
+      else if(population > 22&& population < 31 && popGrowth > 100)
+      {
+         summary += "Population grew by one\n";
+         population ++;
+      }
+      else if(population > 30 && population < 36 && popGrowth > 230)
+      {
+         summary += "Population grew by one\n";
+         population ++;
+      }
+      else if(population > 35 && population < 45 && popGrowth > 580)
+      {
+         summary += "Population grew by one\n";
+         population ++;
+      }
+      else if(population > 44 && population < 55 && popGrowth > 900)
+      {
+         summary += "Population grew by one\n";
+         population ++;
+      }
+      else if(population > 54 && population < 60 && popGrowth > 1700)
+      {
+         summary += "Population grew by one\n";
+         population ++;
+      }
+      else if(population > 59 && popGrowth > 2800)
+      {
+         summary += "Population grew by one\n";
+         population ++;
+      }
+      popGrowth = 0;
       
       
       
@@ -727,7 +1076,7 @@ public class Tribe
       happiness += happinessPerTurn;
       
       if(isNomadic)
-         nomadicValue -= nomadicDecay
+         nomadicValue -= nomadicDecayPerTurn;
       
       
       
