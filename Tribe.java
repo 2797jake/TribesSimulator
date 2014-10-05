@@ -56,6 +56,7 @@ public class Tribe
    private boolean canTrade;
    private int tradeCount;
    private int defensePactCount;
+   private int hidingCount;
    public Tribe(String n)
    {
       name = n;
@@ -113,6 +114,7 @@ public class Tribe
       canBeAttacked = true;
       canTrade = false;
       tradeCount = 0;
+      hidingCount = 0;
    }
    
    public int getPopulation()
@@ -215,7 +217,8 @@ public class Tribe
          foodProduction = foodProduction * 1.1;
       //17.63
       
-      
+      if(hidingCount > 0)
+         foodProduction = foodProduction*.75;
       
       return foodProduction;
    }
@@ -246,6 +249,8 @@ public class Tribe
          stoneProduction = stoneProduction * 1.45;
 
       
+      if(hidingCount > 0)
+         stoneProduction *= .75;      
       return stoneProduction;
    }
    
@@ -274,7 +279,8 @@ public class Tribe
       if(cabin == 3)
          stoneProduction = stoneProduction * 1.45;
 
-      
+      if(hidingCount > 0)
+         stoneProduction *= .75;
       return stoneProduction;
    }
    
@@ -935,8 +941,9 @@ public class Tribe
          
       int rand = 0;
       rand = 1 + (int)(Math.random()*(100));
-      //if(rand >= 1 && rand <= 10)
-      //   summary += simulateAggressiveTribe();
+      rand = 5;
+      if(rand >= 1 && rand <= 10)
+         summary += simulateAggressiveTribe();
       if(rand >= 11 && rand <= 21)
          summary += simulatePeacefulTribe();
       
@@ -1035,8 +1042,8 @@ public class Tribe
          
       int rand = 0;
       rand = 1 + (int)(Math.random()*(100));
-      //if(rand >= 1 && rand <= 10)
-       //  summary +=simulateAggressiveTribe();
+      if(rand >= 1 && rand <= 10)
+         summary +=simulateAggressiveTribe();
       if(rand >= 11 && rand <= 21)
          summary += simulatePeacefulTribe();
       
@@ -1089,7 +1096,7 @@ public class Tribe
       }
       
       
-      
+      hidingCount--;
       
       
       return summary;
@@ -1139,6 +1146,132 @@ public class Tribe
       
       return summary;
    }
+   
+   
+   
+   public String simulateAggressiveTribe()
+   {
+      String summary = "";
+      System.out.println("You encountered an aggressive tribe, what would you like to do?");
+      Scanner scan = new Scanner(System.in);
+      String in = scan.nextLine();
+      System.out.println(in);
+      int rand = 0;
+      if(in.equalsIgnoreCase("clash"))
+      {
+         rand = 1 + (int)(Math.random()*(100));
+         if((defense*100)-10 <= rand)
+         {
+            summary += "You won the battle, gaining population, food, wood, and stone\n";
+            population = population*1.2;
+            food = food*1.2;
+            stone = stone*1.25;
+            wood = wood*1.25;
+         }
+         else
+         {
+            summary += "You lost the battle, losing population, food, wood, stone, food, and happiness\n";
+            population = population*.8;
+            food = food*.8;
+            stone = stone*.75;
+            wood = wood*.75;
+            happiness -= .1;
+         }
+      }
+      
+      if(in.equalsIgnoreCase("peace offering"))
+      {
+         System.out.println("dipshit");
+         System.out.println("How much wood?");
+         int wo = scan.nextInt();
+         if(wo > wood)
+         {  
+            System.out.println("dipshit2"); 
+            System.out.println("Not enough resources");
+            simulateAggressiveTribe();
+         }
+         System.out.println("How much stone?");
+         int st = scan.nextInt();
+         if(st > stone)
+         {   
+            System.out.println("Not enough resources");
+            simulateAggressiveTribe();
+         }
+         System.out.println("How much food?");
+         int fo = scan.nextInt();
+         if(fo > food)
+         {   
+            System.out.println("Not enough resources");
+            simulateAggressiveTribe();
+         }
+         food -= fo;
+         stone -= st;
+         wood -= wo;
+         int c = fo+st+wo;
+         double chance = 0;
+         for(int n = 0; n < c; n++)
+         {
+            chance += .07;
+         }
+         rand = 1 + (int)(Math.random()*(100));
+         chance *= 100;
+         if(chance <= rand)
+         {
+            summary += "The peace offering was accepted\n";
+         }
+         else
+         {
+            summary += "The peace offering was not accepted, the tribe raided resulting in a loss of happiness, food, population, stone, and wood\n";
+            happiness -= .1;
+            population = population*.8;
+            food = food*.8;
+            stone = stone*.75;
+            wood = wood*.75;
+         }
+         
+         
+      }
+      if(in.equalsIgnoreCase("intimidate"))
+      {
+         System.out.println("dumbass");
+         if(defense < .75)
+            simulateAggressiveTribe();
+         rand = 1 + (int)(Math.random()*(100));
+         if(rand <= 85)
+         {
+            summary += "The tribe retreated\n";
+         }
+         else
+         {
+            summary += "The tribe did not back down, it raided resulting in a loss of happiness, food, population, stone, and wood\n";
+            happiness -= .1;
+            population = population*.8;
+            food = food*.8;
+            stone = stone*.75;
+            wood = wood*.75;
+         }
+         
+      }
+      
+      if(in.equalsIgnoreCase("hide") && isNomadic)
+      {
+         hidingCount = 5;
+         happiness -= .1;
+         canTrade = false;
+         tradeCount = 0;
+         summary += "You are now in hiding for 5 days, reducing your happiness and resources production until you leave hiding\n";
+      }
+      if(in.equalsIgnoreCase("hide") && !isNomadic)
+         simulateAggressiveTribe();
+         
+      //hasty relocation
+      
+      
+      return summary;
+   }
+   
+   
+   
    
    public void executeTrade()
    {
