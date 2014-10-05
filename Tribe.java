@@ -1,3 +1,4 @@
+import java.util.*;
 public class Tribe
 {
    private String name;
@@ -31,7 +32,6 @@ public class Tribe
    private double positivechanceincrease;
    private double negativechanceincrease;
    private double defense;
-   private boolean canTrade;
    private double nomadicDecayPerTurn;
    private double nomadicValue;
    private double food;
@@ -53,6 +53,9 @@ public class Tribe
    private double woodCost;
    private double stoneCost;
    private boolean canBeAttacked;
+   private boolean canTrade;
+   private int tradeCount;
+   private int defensePactCount;
    public Tribe(String n)
    {
       name = n;
@@ -108,6 +111,8 @@ public class Tribe
       woodCost = 0;
       stoneCost = 0;
       canBeAttacked = true;
+      canTrade = false;
+      tradeCount = 0;
    }
    
    public int getPopulation()
@@ -322,6 +327,10 @@ public class Tribe
          defense += .05;
       for(int i = 0; i < torture; i++)
          defense += .03;
+      if(defensePactCount > 0)
+      {
+         defense += .08;
+      }
    }
    
    public double getResearch(int workers)
@@ -676,31 +685,9 @@ public class Tribe
          capitol++;
    }
    
-   
-   
-   public String executeDay(int farming, int worshipping, int defending, int researching, int woodcutting, int stonemining, int itemC)
+   public String doWeather()
    {
       String summary = "";
-      int cc = itemC;
-      if(itemC * .75 > stone)
-      {
-         System.out.println("Not enough resources");
-         Base.cycle(this);
-      }
-      itemC = cc;
-      if(itemC * .5 > wood)
-      {
-         System.out.println("Not enough resources");
-         Base.cycle(this);
-      }
-      
-      weapons += cc;
-      wood -= cc*.5;
-      stone -= cc*.75;
-      summary += "Produced " + cc + " weapons\n";
-   
-   
-   
       if(isStorm)
       {
          isRainbow = true;
@@ -751,10 +738,12 @@ public class Tribe
          happiness += .2;
          summary += "Happines increased due to the good weather, bonus construction rate due to the weather";
       }
-      
-      
-      
-      
+      return summary;
+   }
+   
+   public String doConstruction()
+   {
+      String summary = "";
       if(!struc.equals(""))
          summary += "Work done on new structure: " + Base.round(getConstruction(), 2) + " completed " + Base.round(construction,2) + " out of " + maxConstruction + "\n";
       if(construction >= maxConstruction && maxConstruction > 0)
@@ -762,33 +751,17 @@ public class Tribe
          completeStructure();
          construction = 0;
          maxConstruction = 0;
-         summary += struc + " was completed, the " + builders + " workers are now available";
+         summary += struc + " was completed, the " + builders + " workers are now available\n";
          builders = 0;
          struc = "";
       }
-      
-      
-      //
-      //
-      //
-      //
-      
-      
-      
-      
-      
-      
-      
-      double foodProduction = getFoodProduction(farming);
-      food += foodProduction;
-      summary += "Food Produced: " + Base.round(foodProduction, 2) + "\n";
-      double stoneProduction = getStoneProduction(stonemining);
-      stone += stoneProduction;
-      summary += "Stone Produced: " + Base.round(stoneProduction, 2)+"\n";
-      double woodProduction = getWoodProduction(woodcutting);
-      wood += woodProduction;
-      summary += "Wood Produced: " + Base.round(woodProduction, 2)+"\n";
-      
+      return summary;
+   }
+   
+   
+   public String doWorship(int worshipping)
+   {
+      String summary = "";
       if(worshipping > 0)
       {
          setKarmaProduction(worshipping);
@@ -799,22 +772,6 @@ public class Tribe
          setKarmaProduction(0);
          summary += "Karma Produced: " + Base.round(positivechanceincrease, 2) + "\n";
       }
-      setDefenseValue(defending);
-      summary += "Defense Value: " + Base.round(defense, 2) + "\n";
-      
-      summary += "Research Produced: " + getResearch(researching)+"\n";
-      
-      //
-      //
-      
-      
-      //check if research is enough to upgrade
-      
-      
-      
-      
-      //
-      //
       if(karma <= 0)
       {
          summary += "You have fallen out of favor with the gods, your negative calculation odds are increased for the next 5 days. you cannot produce any karma until this curse is lifted\n";
@@ -831,7 +788,12 @@ public class Tribe
       {
          summary += daysOfCurse + " days left until the curse is lifted\n";
       }
-      
+      return summary;
+   }
+   
+   public String populationGrowth()
+   {
+      String summary = "";
       food -= population;
       summary += population + " food was consumed to maintain your population\n";
       
@@ -882,38 +844,12 @@ public class Tribe
          population ++;
       }
       popGrowth = 0;
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      if(daysOfCurse == 0)//this and everything after it go at the end of the execute day function
-      {
-         summary += "Your curse has been lifted, you may now produce karma again\n";
-         daysOfCurse = -1;
-         canKarma = true;
-         negativechanceincrease += 15;
-         karma = 1;
-      }
-      happinessPerTurn = 0;
+      return summary;
+   }
+   
+   public String doHappiness()
+   {
+      String summary = "";
       if(Base.round(happiness, 2) > .5)
          happinessPerTurn = -.05;
       if(Base.round(happiness, 2) < .5 )
@@ -927,10 +863,95 @@ public class Tribe
       if(theater == 1 && Base.round(happiness, 2) > .5)
          happinessPerTurn = 0;
       
-      happiness += happinessPerTurn;  
+      happiness += happinessPerTurn; 
+      return summary;
+   }
+   
+   
+   
+   public String executeDay(int farming, int worshipping, int defending, int researching, int woodcutting, int stonemining, int itemC)
+   {
+      String summary = "";
+      int cc = itemC;
+      if(itemC * .75 > stone)
+      {
+         System.out.println("Not enough resources");
+         Base.cycle(this);
+      }
+      itemC = cc;
+      if(itemC * .5 > wood)
+      {
+         System.out.println("Not enough resources");
+         Base.cycle(this);
+      }
+
+      
+      
+      weapons += cc;
+      wood -= cc*.5;
+      stone -= cc*.75;
+      summary += "Produced " + cc + " weapons\n";
+   
+   
+      summary += doWeather();
+      
+      
+      summary += doConstruction();
+
+      double foodProduction = getFoodProduction(farming);
+      food += foodProduction;
+      summary += "Food Produced: " + Base.round(foodProduction, 2) + "\n";
+      double stoneProduction = getStoneProduction(stonemining);
+      stone += stoneProduction;
+      summary += "Stone Produced: " + Base.round(stoneProduction, 2)+"\n";
+      double woodProduction = getWoodProduction(woodcutting);
+      wood += woodProduction;
+      summary += "Wood Produced: " + Base.round(woodProduction, 2)+"\n";
+      
+      summary += doWorship(worshipping);
+      
+      setDefenseValue(defending);
+      summary += "Defense Value: " + Base.round(defense, 2) + "\n";
+      
+      summary += "Research Produced: " + getResearch(researching)+"\n";
+      
+      summary += populationGrowth();
+
+      if(daysOfCurse == 0)//this and everything after it go at the end of the execute day function
+      {
+         summary += "Your curse has been lifted, you may now produce karma again\n";
+         daysOfCurse = -1;
+         canKarma = true;
+         negativechanceincrease += 15;
+         karma = 1;
+      }
+      happinessPerTurn = 0;
+      
+      summary += doHappiness(); 
       
       if(isNomadic)
          nomadicValue -= nomadicDecayPerTurn;
+         
+         
+      int rand = 0;
+      rand = 1 + (int)(Math.random()*(100));
+      //if(rand >= 1 && rand <= 10)
+      //   summary += simulateAggressiveTribe();
+      if(rand >= 11 && rand <= 21)
+         summary += simulatePeacefulTribe();
+      
+      if(tradeCount < 1)
+      {
+         canTrade = false;
+         summary += "You can no longer trade with the peaceful village\n";
+      }
+      if(canTrade)
+      {
+         tradeCount--;
+         summary += tradeCount + " days left until the trading village departs\n";
+      }
+      
+      defensePactCount--;
       
       return summary;
    }
@@ -944,8 +965,6 @@ public class Tribe
       stoneCost = 0;
       woodCost += cc*.5;
       stoneCost += cc*.75;
-      
-      
       
       struc = structure;
       builders = working;
@@ -969,60 +988,7 @@ public class Tribe
          Base.cycle(this);
       }
       
-      
-   
-      if(isStorm)
-      {
-         isRainbow = true;
-         canBeAttacked = true;
-      }
-      else
-      {
-         
-         isRain = false;
-         isWarm = false;
-         isRainbow = false;
-         int rand = 1 + (int)(Math.random()*100);
-         System.out.println(rand + "dsaWSZ");
-         if(rand < 10)
-            isRain = true;
-         if(rand < 16 && rand > 9)
-            isStorm = true;
-         if(rand < 22 && rand > 15)
-            isWarm = true;
-      }
-      if(isRain)
-      {
-         happiness -= .2;
-         summary += "Happiness decreased due to rain, food production increased due to rain\n";
-      }
-      
-      if(isStorm)
-      {
-         happiness -= .2;
-         summary += "Happiness decreased due to the storm, cannot be attacked due to the storm\n";
-         canBeAttacked = false;
-         int rrand = 1 + (int)(Math.random()*100);
-         if(rrand < 11)
-         {
-            population --;
-            summary += "A worker was struck by lightning and died due to the storm\n";
-         }
-      }
-      
-      if(isRainbow)
-      {
-         happiness += .3;
-         summary += "Happiness increased due to the rainbow, bonus karma due to the rainbow\n";
-      }
-      
-      if(isWarm)
-      {
-         happiness += .2;
-         summary += "Happines increased due to the good weather, bonus construction rate due to the weather";
-      }
-      
-      
+      summary += doWeather();
       
       wood -= woodCost;
       stone -= stoneCost;
@@ -1033,13 +999,6 @@ public class Tribe
       stone -= cc*.75;
       summary += "Produced " + cc + " weapons\n";
       
-      
-      
-      //
-      //
-      //
-      //
-
       double foodProduction = getFoodProduction(farming);
       food += foodProduction;
       summary += "Food Produced: " + Base.round(foodProduction, 2) + "\n";
@@ -1050,127 +1009,14 @@ public class Tribe
       wood += woodProduction;
       summary += "Wood Produced: " + Base.round(woodProduction, 2)+"\n";
       
-      if(worshipping > 0)
-      {
-         setKarmaProduction(worshipping);
-         summary += "Karma Produced: " + Base.round(positivechanceincrease, 2) + "\n";
-      }
-      if(worshipping == 0)
-      {
-         setKarmaProduction(0);
-         summary += "Karma Produced: " + Base.round(positivechanceincrease, 2) + "\n";
-      }
+      summary += doWorship(worshipping);
+      
       setDefenseValue(defending);
       summary += "Defense Value: " + Base.round(defense, 2) + "\n";
       
       summary += "Research Produced: " + getResearch(researching)+"\n";
       
-      //
-      //
-      /*if(!struc.equals(""))
-         summary += "Work done on new structure: " + Base.round(getConstruction(), 2) + " completed " + Base.round(construction,2) + " out of " + maxConstruction + "\n";
-      if(construction >= maxConstruction && maxConstruction > 0)
-      {
-         completeStructure();
-         construction = 0;
-         maxConstruction = 0;
-         summary += struc + " was completed, the " + builders + " workers are now available";
-         builders = 0;
-         struc = "";
-      }*/
-      
-      //check if research is enough to upgrade
-      
-      if(karma <= 0)
-      {
-         summary += "You have fallen out of favor with the gods, your negative calculation odds are increased for the next 5 days. you cannot produce any karma until this curse is lifted\n";
-         karma = 100;
-         canKarma = false;
-         daysOfCurse = 5;
-         negativechanceincrease += -15;
-      }
-      if(daysOfCurse > 0)
-      {
-         daysOfCurse--;
-      }
-      if(karma == 100)
-      {
-         summary += daysOfCurse + " days left until the curse is lifted";
-         
-      }
-      
-      food -= population;
-      summary += population + " food was consumed to maintain your population\n";
-      
-      if(food < 0)
-         Base.gameOver();
-      double f = food;
-      double p = population;
-      System.out.println(f-p + "foods");
-      popGrowth += f-p;
-      int count = 0;
-      if(population == 18&& popGrowth > 20)
-      {
-         summary += "Population grew by one\n";
-         population ++;
-      }
-      else if(population > 18&& population < 23 && popGrowth > 45)
-      {
-         summary += "Population grew by one\n";
-         population ++;
-      }
-      else if(population > 22&& population < 31 && popGrowth > 100)
-      {
-         summary += "Population grew by one\n";
-         population ++;
-      }
-      else if(population > 30 && population < 36 && popGrowth > 230)
-      {
-         summary += "Population grew by one\n";
-         population ++;
-      }
-      else if(population > 35 && population < 45 && popGrowth > 580)
-      {
-         summary += "Population grew by one\n";
-         population ++;
-      }
-      else if(population > 44 && population < 55 && popGrowth > 900)
-      {
-         summary += "Population grew by one\n";
-         population ++;
-      }
-      else if(population > 54 && population < 60 && popGrowth > 1700)
-      {
-         summary += "Population grew by one\n";
-         population ++;
-      }
-      else if(population > 59 && popGrowth > 2800)
-      {
-         summary += "Population grew by one\n";
-         population ++;
-      }
-      popGrowth = 0;
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
+      summary += populationGrowth();
       
       if(daysOfCurse == 0)//this and everything after it go at the end of the execute day function
       {
@@ -1181,26 +1027,31 @@ public class Tribe
          karma = 1;
       }
       
-      happinessPerTurn = 0;
-      if(Base.round(happiness, 2) > .5)
-         happinessPerTurn = -.05;
-      if(Base.round(happiness, 2) < .5 )
-         happinessPerTurn = .05;
-      if(Base.round(happiness, 2) == .5)
-         happinessPerTurn = 0;
-      if(theater == 1 && Base.round(happiness, 2) == .5)
-         happinessPerTurn = .05;
-      if(theater == 1 && Base.round(happiness, 2) < .5)
-         happinessPerTurn = .1;
-      if(theater == 1 && Base.round(happiness, 2) > .5)
-         happinessPerTurn = 0;
-      
-      happiness += happinessPerTurn;
+      summary += doHappiness();
       
       if(isNomadic)
          nomadicValue -= nomadicDecayPerTurn;
+         
+         
+      int rand = 0;
+      rand = 1 + (int)(Math.random()*(100));
+      //if(rand >= 1 && rand <= 10)
+       //  summary +=simulateAggressiveTribe();
+      if(rand >= 11 && rand <= 21)
+         summary += simulatePeacefulTribe();
       
+      if(tradeCount < 1)
+      {
+         canTrade = false;
+         summary += "You can no longer trade with the peaceful village\n";
+      }
+      if(canTrade)
+      {
+         tradeCount--;
+         summary += tradeCount + " days left until the trading village departs\n";
+      }
       
+      defensePactCount--;
       
       return summary;
    }
@@ -1253,4 +1104,116 @@ public class Tribe
    {
       return builders;
    }  
+   
+   public String simulatePeacefulTribe()
+   {
+      String summary = "";
+      System.out.println("You encountered a peaceful tribe, what would you like to do?");
+      Scanner scan = new Scanner(System.in);
+      String in = scan.nextLine();
+      if(in.equalsIgnoreCase("destroy"))
+      {
+         happiness -= .1;
+         food += 10;
+         wood = wood * 1.25;
+         stone = stone*1.25;
+         summary += "Decrease in happiness, increase in wood, food, and stone due to the destruction of the peaceful tribe\n";
+         
+      }
+      if(in .equalsIgnoreCase("assemilate"))
+      {
+         happiness += .1;
+         population = population*1.2;
+         summary += "Increase in happiness and population due to the assemilation of the peaceful tribe\n";
+      }
+      if(in.equalsIgnoreCase("trade"))
+      {
+         canTrade = true;
+         tradeCount = 31;
+      }
+      if(in.equalsIgnoreCase("Defense Pact"))
+      {
+         defensePactCount = 15;
+      }
+      
+      
+      return summary;
+   }
+   
+   public void executeTrade()
+   {
+      if(canTrade)
+      {
+         Scanner scan = new Scanner(System.in);
+         String in = "";
+         System.out.println("Would you like to exchange stone for wood at a .9:1 ratio?");
+         in = scan.next();
+         int amt = 0;
+         if(in.equalsIgnoreCase("yes"))
+         {
+            System.out.println("How much stone?");
+            amt = scan.nextInt();
+            if(amt > stone)
+            {
+               System.out.println("Not enough resources");
+               executeTrade();
+            }
+            stone -= amt;
+            wood += amt*.9;
+            return;
+         }
+         System.out.println("Would you like to exchange wood for stone at a .9:1 ratio?");
+         in = scan.next();
+         if(in.equalsIgnoreCase("yes"))
+         {
+            System.out.println("How much wood?");
+            amt = scan.nextInt();
+            if(amt > wood)
+            {
+               System.out.println("Not enough resources");
+               executeTrade();
+            }
+            wood -= amt;
+            stone += amt*.9;
+            return;
+         }
+         System.out.println("Would you like to exchange stone for food at a .8:1 ratio?");
+         in = scan.next();
+         if(in.equalsIgnoreCase("yes"))
+         {
+            System.out.println("How much stone?");
+            amt = scan.nextInt();
+            if(amt > stone)
+            {
+               System.out.println("Not enough resources");
+               executeTrade();
+            }
+            stone -= amt;
+            food += amt*.8;
+            return;
+         }
+         
+         System.out.println("Would you like to exchange wood for food at a .8:1 ratio?");
+         in = scan.next();
+         if(in.equalsIgnoreCase("yes"))
+         {
+            System.out.println("How much wood?");
+            amt = scan.nextInt();
+            if(wood > stone)
+            {
+               System.out.println("Not enough resources");
+               executeTrade();
+            }
+            wood -= amt;
+            food += amt*.8;
+            return;
+         }
+      }
+      else
+         return;
+   }
+   
+   
+   
+   
 }

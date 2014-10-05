@@ -152,6 +152,7 @@ public class Base
       //Display Stats
       tribe.displayStats();
       //Execute Night
+      tribe.executeTrade();
       System.out.println("Press enter when you are ready to start the night");
       scan.next();
       System.out.println(tribe.executeNight(defending));
