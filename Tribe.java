@@ -122,6 +122,11 @@ public class Tribe
       return (int)population;
    }
    
+   public boolean isNomadic()
+   {
+      return isNomadic;
+   }
+   
    public void displayStats()
    {
       System.out.println("Tribe Statistics:");
@@ -199,7 +204,8 @@ public class Tribe
          f = 1;
          rand = -.08 + (Math.random()*.95);
          rand += 1;
-         rand = rand - (.5-(nomadicValue/2));
+         if(isNomadic)
+            rand = rand - (.5-(nomadicValue/2));
          foodProduction += rand;
       }
       double happy = happiness;
@@ -219,6 +225,10 @@ public class Tribe
       
       if(hidingCount > 0)
          foodProduction = foodProduction*.75;
+      if(hasIron)
+         foodProduction *= 1.4;
+      else if(hasCopper)
+         foodProduction *= 1.2;
       
       return foodProduction;
    }
@@ -251,6 +261,10 @@ public class Tribe
       
       if(hidingCount > 0)
          stoneProduction *= .75;      
+      if(hasIron)
+         stoneProduction *= 1.3;
+      else if(hasCopper)
+         stoneProduction *= 1.15;
       return stoneProduction;
    }
    
@@ -281,8 +295,13 @@ public class Tribe
 
       if(hidingCount > 0)
          stoneProduction *= .75;
+      if(hasIron)
+         stoneProduction *= 1.3;
+      else if(hasCopper)
+         stoneProduction *= 1.15;
       return stoneProduction;
    }
+   
    
    
    public void setKarmaProduction(int workers)
@@ -346,7 +365,7 @@ public class Tribe
       {
          if((0 + (int)(Math.random()*100)) > 80)
          {
-            production += .023;
+            production += .05;
          }
       }
       if(lab == 1)///lab allows for 30% more experiments per turn
@@ -355,7 +374,7 @@ public class Tribe
          {
             if((0 + (int)(Math.random()*100)) > 80)
             {
-               production += .023;
+               production += .05;
             }
          }
       }
@@ -706,7 +725,6 @@ public class Tribe
          isWarm = false;
          isRainbow = false;
          int rand = 1 + (int)(Math.random()*100);
-         System.out.println(rand + "dsaWSZ");
          if(rand < 10)
             isRain = true;
          if(rand < 16 && rand > 9)
@@ -941,7 +959,6 @@ public class Tribe
          
       int rand = 0;
       rand = 1 + (int)(Math.random()*(100));
-      rand = 5;
       if(rand >= 1 && rand <= 10)
          summary += simulateAggressiveTribe();
       if(rand >= 11 && rand <= 21)
@@ -958,8 +975,29 @@ public class Tribe
          summary += tradeCount + " days left until the trading village departs\n";
       }
       
-      defensePactCount--;
+      if(researchValue >= 1 && isNomadic)
+      {
+         summary += "You have discovered agriculture, your tribe is no longer nomadic, this also results in an increase in happiness.";
+         isNomadic = false;
+         researchValue = 0;
+         happiness += .1;
+      }
+      if(researchValue >= 1 && !isNomadic && !hasCopper && !hasIron)
+      {
+         summary += "You have discovered copper, your tribe now has increased production this also results in an increase in happiness.";
+         hasCopper = true;
+         researchValue = 0;
+         happiness += .1;
+      }
+      if(researchValue >= 1 && !isNomadic && hasCopper && !hasIron)
+      {
+         summary += "You have discovered iron, your tribe now has increased production this also results in an increase in happiness.";
+         hasIron = true;
+         researchValue = 0;
+         happiness += .1;
+      }
       
+      defensePactCount--;
       return summary;
    }
    public String executeDayWithStructure(int working, int farming, int worshipping, int defending, int researching, int woodcutting, int stonemining, int itemC, String structure)
@@ -1060,12 +1098,41 @@ public class Tribe
       
       defensePactCount--;
       
+      if(researchValue >= 1 && isNomadic)
+      {
+         summary += "You have discovered agriculture, your tribe is no longer nomadic, this also results in an increase in happiness.";
+         isNomadic = false;
+         researchValue = 0;
+         happiness += .1;
+      }
+      if(researchValue >= 1 && !isNomadic && !hasCopper && !hasIron)
+      {
+         summary += "You have discovered copper, your tribe now has increased production this also results in an increase in happiness.";
+         hasCopper = true;
+         researchValue = 0;
+         happiness += .1;
+      }
+      if(researchValue >= 1 && !isNomadic && hasCopper && !hasIron)
+      {
+         summary += "You have discovered iron, your tribe now has increased production this also results in an increase in happiness.";
+         hasIron = true;
+         researchValue = 0;
+         happiness += .1;
+      }
+      
       return summary;
    }
    
    
    
-   
+   public boolean hasCopper()
+   {
+      return hasCopper;
+   }
+   public boolean hasIron()
+   {
+      return hasIron;
+   }
    
    
    public String executeNight(int working)
@@ -1233,7 +1300,6 @@ public class Tribe
       }
       if(in.equalsIgnoreCase("intimidate"))
       {
-         System.out.println("dumbass");
          if(defense < .75)
             simulateAggressiveTribe();
          rand = 1 + (int)(Math.random()*(100));
@@ -1264,9 +1330,44 @@ public class Tribe
       if(in.equalsIgnoreCase("hide") && !isNomadic)
          simulateAggressiveTribe();
          
+      
+      if(in.equalsIgnoreCase("relocate") && isNomadic)
+      {
+         summary += relocate(true);
+      }
+      if(in.equalsIgnoreCase("relocate") && !isNomadic)
+         simulateAggressiveTribe();
       //hasty relocation
       
       
+      return summary;
+   }
+   
+   public String relocate(boolean hasty)
+   {
+      String summary = "";
+      int rand = 0;
+      
+      if(hasty)
+      {
+         summary += "You hastily moved the tribe, restorting the surrounding resources, improving resource production. This resulted in a loss of happiness, population, and food\n";
+         happiness -= .15;
+         population = population * .8;
+         rand = 75 + (int)(Math.random()*(99));
+         food = food*(rand/100);
+         nomadicValue = 1;
+         
+      }
+      
+      else//regular move
+      {
+         System.out.println("You moved the tribe, restorting the surrounding resources, improving resource production. This resulted in a loss of happiness, population, and food\n");
+         happiness -= .1;
+         population = population * .9;
+         rand = 85 + (int)(Math.random()*(99));
+         food = food*(rand/100);
+         nomadicValue = 1;
+      }
       return summary;
    }
    

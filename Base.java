@@ -12,7 +12,7 @@ public class Base
    {
       System.out.println("|\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"|");
       System.out.println("|                      |");
-      System.out.println("|Tribes Simulator 0.1.1|");
+      System.out.println("|Tribes Simulator 1.0.1|");
       System.out.println("|                      |");
       System.out.println("|\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"|");
       Scanner scan = new Scanner(System.in);
@@ -63,7 +63,16 @@ public class Base
    {
       Scanner scan = new Scanner(System.in);
       //Display stats
-      
+      if(tribe.isNomadic())
+      {
+         System.out.println("Would you like to relocate?");
+         String n = scan.next();
+         if(n.equalsIgnoreCase("yes"))
+         {
+            tribe.relocate(false);
+         System.out.println("dummy");}
+      }
+      scan.nextLine();
       //Get Instructions for the turn
       System.out.println("Would you like to build anything?");
       String in = scan.nextLine();
@@ -98,7 +107,7 @@ public class Base
       else if(in.equalsIgnoreCase("no"))
       {
       }
-      else
+      else if(true)
       {
          System.out.println("Input not recognized");
          cycle(tribe);
