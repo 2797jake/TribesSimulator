@@ -20,40 +20,6 @@ public class Base
       String name = scan.nextLine();
       Tribe tribe = new Tribe(name);
       
-      /*
-      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
-      tribe.displayStats();
-      tribe = new Tribe(name);
-      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
-      tribe.displayStats();
-      tribe = new Tribe(name);
-      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
-      tribe.displayStats();
-      tribe = new Tribe(name);
-      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
-      tribe.displayStats();
-      tribe = new Tribe(name);
-      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
-      tribe.displayStats();
-      tribe = new Tribe(name);
-      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
-      tribe.displayStats();
-      tribe = new Tribe(name);
-      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
-      tribe.displayStats();
-      tribe = new Tribe(name);
-      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
-      tribe.displayStats();
-      tribe = new Tribe(name);
-      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
-      tribe.displayStats();
-      tribe = new Tribe(name);
-      tribe.executeDay(18, 0, 0, 0, 0, 0, 0);
-      tribe.displayStats();*/
-      
-      
-      
-      
       tribe.displayStats();
       cycle(tribe);
       
@@ -70,7 +36,6 @@ public class Base
          if(n.equalsIgnoreCase("yes"))
          {
             tribe.relocate(false);
-         System.out.println("dummy");}
       }
       scan.nextLine();
       //Get Instructions for the turn
