@@ -1032,6 +1032,8 @@ public class Tribe
          System.out.println("Not enough resources");
          Base.cycle(this);
       }
+      System.out.println(" udfjtaurhr " + stoneCost);
+      
       
       summary += doWeather();
       
