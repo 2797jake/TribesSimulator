@@ -1,10 +1,12 @@
 import java.util.*;
+import java.io.*;
 public class Base
 {
-   public static void main(String args[])
+   public static void main(String args[]) throws FileNotFoundException
    {
-      
-      newTribe();
+      Map map0 = new Map(0);
+      map0.sort();
+      //newTribe();
 
    }
    

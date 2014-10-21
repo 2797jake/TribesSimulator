@@ -57,6 +57,8 @@ public class Tribe
    private int tradeCount;
    private int defensePactCount;
    private int hidingCount;
+   private int dayOfYear;
+   private String season;
    public Tribe(String n)
    {
       name = n;
@@ -115,6 +117,8 @@ public class Tribe
       canTrade = false;
       tradeCount = 0;
       hidingCount = 0;
+      season = "spring";
+      dayOfYear = 1;
    }
    
    public int getPopulation()
@@ -163,6 +167,8 @@ public class Tribe
       System.out.println();
       System.out.print("|");
       System.out.print(isDay ? "It is daytime" : "It is nighttime");
+      System.out.println();
+      System.out.println("It is " + season);
       System.out.println();
       System.out.println("|Structures:");
       System.out.print((temple == 1) ? "|              Temple\n              " : "");
@@ -892,6 +898,33 @@ public class Tribe
    }
    
    
+   public String dayOfYear()
+   {
+      String summary = "";
+      dayOfYear++;
+      if(dayOfYear > 365)
+      {
+         dayOfYear = 1;
+      }
+      summary += "It is day " + dayOfYear + " of the year\n";
+      //1-93 spring
+      //next 93 summer
+      //next 90 autumn
+      //next 89 winter
+      if(dayOfYear >= 1 && dayOfYear <= 93)
+      {
+         season = "spring";
+      }
+      else if(dayOfYear >= 94 && dayOfYear<= 186)
+         season = "summer";
+      else if(dayOfYear >= 187 && dayOfYear <= 276)
+         season = "autumn";
+      else
+         season = "winer";
+      summary += "The season is " + season + "\n";
+      return summary;
+   }
+   
    
    public String executeDay(int farming, int worshipping, int defending, int researching, int woodcutting, int stonemining, int itemC)
    {
@@ -908,7 +941,8 @@ public class Tribe
          System.out.println("Not enough resources");
          Base.cycle(this);
       }
-
+      
+      summary += dayOfYear();
       
       
       weapons += cc;
@@ -1035,6 +1069,7 @@ public class Tribe
       System.out.println(" udfjtaurhr " + stoneCost);
       
       
+      summary += dayOfYear();
       summary += doWeather();
       
       wood -= woodCost;
@@ -1250,12 +1285,10 @@ public class Tribe
       
       if(in.equalsIgnoreCase("peace offering"))
       {
-         System.out.println("dipshit");
          System.out.println("How much wood?");
          int wo = scan.nextInt();
          if(wo > wood)
          {  
-            System.out.println("dipshit2"); 
             System.out.println("Not enough resources");
             simulateAggressiveTribe();
          }
